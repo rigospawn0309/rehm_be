@@ -16,7 +16,6 @@ exports.getProductos = async (req, res) => {
       .limit(Number(limite)),
     ]);
     res.json(productos);
-    console.log(productos);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error al obtener productos");
