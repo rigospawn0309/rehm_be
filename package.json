@@ -2,17 +2,31 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "dev": "nodemon ."
   },
-  "author": "Rodrigo Henriquez Mundaca",
+  "author": "Rodrigo Henriquez Mundaca  <rigospawn@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.3.4",
+    "chalk": "^5.2.0",
     "cors": "^2.8.5",
+    "crons": "^1.1.1-alpha.0",
+    "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "helmet": "^6.0.1",
+    "hpp": "^0.2.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "mongoose": "^7.0.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "nsqjs": "^0.13.0",
+    "puppeteer": "^19.7.3",
+    "twilio": "^4.8.0",
+    "underscore": "^1.13.6",
+    "uuid": "^9.0.0",
+    "validator": "^13.9.0"
   }
 }

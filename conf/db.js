@@ -1,21 +1,42 @@
 const mongoose = require('mongoose');
+require('dotenv').config({path: './.env'});
 
-require('dotenv').config({path: 'dev.env'});
+process.on('uncaughtException', err => {
+    console.log('UNCAUGHT EXCEPTION!!! shutting down...');
+    console.log(err.name, err.message);
+    process.exit(1);
+});
 
-const USER = process.env.MONGO_USER;
-const PASSWORD = process.env.MONGO_PASSWORD;
-const HOST = process.env.MONGO_HOST;
-const auth_db = process.env.MONGO_auth_db;
-
+const {
+    MONGO_USERNAME,
+    MONGO_PASSWORD,
+    MONGO_HOSTNAME,
+    MONGO_PORT,
+    MONGO_DB
+  } = process.env;
+  
+  const options = {
+    useNewUrlParser: true,
+    connectTimeoutMS: 10000
+  };
+const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOSTNAME}:${MONGO_PORT}/${MONGO_DB}?authSource=admin`;
+  
 const connnectDB = async () => {
     try {
-        await mongoose.connect(`mongodb+srv://${USER}:${PASSWORD}@${HOST}/${auth_db}`);
-        console.log('DB connected!!')
+        await mongoose.connect(url,options);
+        console.log('DB connected!!');
     } catch (error) {
         console.log(error);
         process.exit(1);
-        
     }
 }
+
+process.on('unhandledRejection', err => {
+    console.log('UNHANDLED REJECTION!!!  shutting down ...');
+    console.log(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
+    });
+});
 
 module.exports = connnectDB
