@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config({path: './config.env'});
+require('dotenv').config({path: '../.env'});
 
 
 // const fileUpload = require('express-fileupload');
@@ -71,7 +71,7 @@ class Server {
 
     listen() {
         this.app.listen( this.port, () => {
-            console.log('Servidor corriendo en puerto' );
+            console.log('Servidor corriendo en puerto',this.port );
         });
     }
 
