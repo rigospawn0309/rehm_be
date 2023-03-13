@@ -111,35 +111,26 @@ exports.putProducto = async (req, res,next) => {
 
 //Delete Logico producto
 exports.deleteProducto = async (req, res = response, next) => {
+  try {  
+  const producto = await Producto.findByIdAndUpdate( req.params.id , {status: false},{new: true});
+    if (!producto) {
+      return next(new AppError(404, 'fail', 'No existe producto con el id seleccionado'), req, res, next);
+  }
+    res.json({Eliminado:producto});
+  } catch (error) {
+    next(error);
+}
+};
+
+//Delete fisico producto
+exports.deleteFisicoProducto = async (req, res, next) => {
   try {
-    const producto = await Producto.findByIdAndDelete(req.params.id, { status: false });
-
-    if (!producto || producto.status === false) {
-        return next(new AppError(404, 'fail', 'No existe producto con el id seleccionado'), req, res, next);
-    }
-
-    res.status(204).json({
-        status: 'success',
-        data: producto
-    });
-    } catch (error) {
-        next(error);
-    }
-    };
-
-//delete fisico producto
-exports.deleteFisicoProducto = Model => async (req, res, next) => {
-  try {
-      const producto = await Model.findByIdAndDelete(req.params.id);
+      const producto = await Producto.findByIdAndDelete(req.params.id);
 
       if (!producto) {
           return next(new AppError(404, 'fail', 'No existe producto con el id seleccionado'), req, res, next);
       }
-
-      res.status(204).json({
-          status: 'success',
-          data: null
-      });
+      res.json({Eliminado:producto});
   } catch (error) {
       next(error);
   }
