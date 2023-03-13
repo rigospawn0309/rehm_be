@@ -13,5 +13,7 @@ router
     .get(categoriaController.getCategoria)
     .patch(categoriaController.putCategoria)
     .delete(categoriaController.deleteCategoria);
+router
+    .delete('/delete/:id', categoriaController.deleteFisicoCategoria);
 
 module.exports = router;

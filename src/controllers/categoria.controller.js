@@ -1,43 +1,48 @@
 const Categoria = require("../models/categoria.model");
+const AppError = require("../utils/appError");
+const APIFeatures = require("../utils/apiFeatures");
 
-//Get categoria
-exports.getCategorias = async (req, res) => {
+//Get Categorias
+exports.getCategorias = async (req, res, next) => {
   try {
-    const { limite = 5, desde = 0 } = req.params;
-    const query = { status: true };
+    const populateCategoria = Categoria.find(req.query)
+    .where('status').equals(true);
 
-    // obtengo en primer caso el total de categoria y el segundo el limite y el desde para filtrar
-    // Hay que tener en cuenta que destructuro en array para obtener cada resultado de la promesa con su nombre
-    const [total, categorias] = await Promise.all([
-      Categoria.countDocuments(query),
-      Categoria.find(query)
-      .skip(Number(desde))
-      .limit(Number(limite)),
-    ]);
-    res.json(
-      categorias
-    );
+    const features = new APIFeatures(populateCategoria, req.query)
+      .sort()
+      .paginate();
+
+    const categoria = await features.query;
+    res.status(200).json({
+      status: "success",
+      results: categoria.length,
+      categoria //devuelve un array de objetos Categoria
+    })
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error al obtener categorias");
+    next(error);
+  } finally {
+    console.log("Get Categorias");
   }
 };
 
-//Get categoria
-exports.getCategoria = async (req, res) => {
+//Get Categoria
+exports.getCategoria = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { ...data } = req.body;
-    let categoria = await Categoria.findById(id);
+      const categoria = await Categoria.findById(req.params.id)
+      .where('status').equals(true);
 
-    if (!categoria) {
-      res.status(404).json({ msg: "La categoria no existe" });
-    }
-    categoria = await Categoria.findByIdAndUpdate(id, data, { new: true });
-    res.json(categoria);
+      if (!categoria) {
+          return next(new AppError(404, 'fail', 'No hay categoria para este id'), req, res, next);
+      }
+
+      res.status(200).json({
+          status: 'success',
+          categoria
+      });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error al obtener categoria");
+      next(error);
+  } finally {
+    console.log("Get Categoria");
   }
 };
 
@@ -58,20 +63,21 @@ exports.postCategoria = async (req, res) => {
       ...body, // se envia primero el rest y luego el brand que esta modificado sino se guardaria lo que viene del body
       nombre
     };
-
     const categoria = new Categoria(data);
     await categoria.save();
     res.status(201).json(categoria);
+
   } catch (error) {
     console.log(error);
     res.status(500).send("Error al crear categoria");
+  } finally {
+    console.log("Post Categorias");
   }
 };
 
 //Put categoria
 exports.putCategoria = async (req, res) => {
   try {
-    console.log('putCategoria() BODY(): ', req.body);
     const { id } =  req.params; 
     const { status, ...data } = req.body;
     if( data.nombre){
@@ -82,22 +88,38 @@ exports.putCategoria = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("Error al actualizar categoria");
+  }finally {
+    console.log("Put Categorias");
   }
 };
 
-//Delete
-exports.deleteCategoria = async (req, res = response) => {
-  try {
-    const { id } = req.params;
-    console.log(req.params);
-    const categoria = await Categoria.findByIdAndUpdate(
-      id,
-      { status: false },
-      { new: true }
-    );
-    res.json({ categoria });
+//Delete Logico Categoria
+exports.deleteCategoria = async (req, res = response, next) => {
+  try {  
+  const categoria = await Categoria.findByIdAndUpdate( req.params.id , {status: false},{new: true});
+    if (!categoria) {
+      return next(new AppError(404, 'fail', 'No existe Categoria con el id seleccionado'), req, res, next);
+  }
+    res.json({Eliminado:categoria});
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error al Borrar categoria");
+    next(error);
+  }finally {
+    console.log("Eliminación logíca Categorias");
+  }
+};
+
+//Delete fisico Categoria
+exports.deleteFisicoCategoria = async (req, res, next) => {
+  try {
+      const categoria = await Categoria.findByIdAndDelete(req.params.id);
+
+      if (!categoria) {
+          return next(new AppError(404, 'fail', 'No existe categoria con el id seleccionado'), req, res, next);
+      }
+      res.json({Eliminado:categoria});
+  } catch (error) {
+      next(error);
+  }finally {
+    console.log("Eliminación fisica Categorias");
   }
 };
