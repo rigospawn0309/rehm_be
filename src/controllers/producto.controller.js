@@ -1,7 +1,6 @@
 const Producto = require("../models/producto.model");
 const AppError = require("../utils/appError");
 const APIFeatures = require("../utils/apiFeatures");
-const log = require('../utils/log')('controller:producto');
 
 //Get productos
 exports.getProductos = async (req, res, next) => {
